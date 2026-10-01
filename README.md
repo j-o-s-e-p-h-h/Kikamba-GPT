@@ -1,1 +1,1 @@
-# Kikamba-LLM
+# Kikamba GPT
