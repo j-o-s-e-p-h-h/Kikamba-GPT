@@ -1,0 +1,4 @@
+{
+  "model": "bigram (counting, +1 smoothing)",
+  "val_bpc": 3.298018390779561
+}
