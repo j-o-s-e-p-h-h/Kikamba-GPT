@@ -5,7 +5,7 @@ Built by Joseph (Botswana), Sept–Oct 2026.
 A small GPT trained from scratch on Kikamba text. It completes sentences. It can't answer questions or translate.
 
 ## Data
-Trained on the Kikamba corpus at github.com/kithyadan/kikamba-corpus (not mine), about 2.6 million tokens.
+Trained on the Kikamba corpus at [github.com/kithyadan/kikamba-corpus](github.com/kithyadan/kikamba-corpus) (not mine), about 2.6 million tokens.
 I kept the diacritics (ũ, ĩ). I tested a no-diacritics version against it: my dad scored 20 samples in total (10 of each) from 1 to 5, and I made a rule beforehand that I'd switch only if plain won by more than 1 point. It won by 0.8, so I kept the diacritics.
 
 ## Model
