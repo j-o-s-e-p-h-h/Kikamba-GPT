@@ -1,0 +1,13 @@
+{
+  "model": "gpt",
+  "config": {
+    "vocab_size": 8000,
+    "block_size": 256,
+    "n_layer": 4,
+    "n_head": 4,
+    "n_embd": 256,
+    "dropout": 0.2
+  },
+  "step": 4750,
+  "val_bpc": 1.521
+}
