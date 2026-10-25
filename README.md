@@ -26,7 +26,7 @@ Blind test: I mixed 10 real corpus sentences with 10 model samples and gave them
 What I take from this: the model gets the words and sound of Kikamba right, even though the sentences don't always make sense.
 
 ## Demo
-Try it: huggingface.co/spaces/j-osep-h/kikamba-gpt
+Try it: [huggingface.co/spaces/j-osep-h/kikamba-gpt](huggingface.co/spaces/j-osep-h/kikamba-gpt)
 The model runs fully in the browser. I wrote the model and training code myself; the demo wrappers (app.py, export_web.py and kikamba.js) were generated with an AI assistant around my trained weights.
 
 Files: `notebooks/` (00 data → 06 evaluate, in order), `models/gpt.py`, `tokenizer/`, `results/` (bpc numbers, loss curve, blind-test sheets).
