@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kikamba GPT</title>
+<style>
+  :root { --bg: #f7f7f5; --card: #ffffff; --ink: #1c1c1a; --muted: #6b6b66; --line: #e2e1dc; --accent: #c2410c; --accent-ink: #ffffff; --soft: #f1efe9; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151513; --card: #1e1e1b; --ink: #ecebe6; --muted: #a3a29b; --line: #34332f; --accent: #f97316; --accent-ink: #1c1c1a; --soft: #26251f; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  label { display: block; font-size: 14px; color: var(--muted); margin: 0 0 6px; }
+  textarea { width: 100%; min-height: 72px; resize: vertical; font: inherit; font-size: 18px; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr 110px; gap: 14px; margin: 16px 0; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=number] { width: 100%; font: inherit; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+  .val { float: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  button { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 11px 22px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  #status { margin-left: 12px; color: var(--muted); font-size: 14px; }
+  #output { margin-top: 18px; min-height: 96px; white-space: pre-wrap; font-size: 18px; background: var(--soft); border-radius: 10px; padding: 14px; border: 1px solid var(--line); }
+  .about { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  .about strong { color: var(--ink); }
+  #test { margin-top: 18px; font: 13px/1.5 ui-monospace, "DejaVu Sans Mono", monospace; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kikamba GPT</h1>
+  <p class="lead">A small GPT trained from scratch on Kikamba text. It runs entirely in your browser: nothing you type is sent anywhere. Start a sentence and it continues it. It does not answer questions or translate.</p>
+
+  <div class="card">
+    <label for="prompt">Start of a Kikamba sentence</label>
+    <textarea id="prompt">Mũndũ</textarea>
+
+    <div class="row">
+      <div>
+        <label for="length">Length (tokens) <span class="val" id="lengthVal">80</span></label>
+        <input id="length" type="range" min="10" max="200" step="10" value="80">
+      </div>
+      <div>
+        <label for="temp">Temperature <span class="val" id="tempVal">0.8</span></label>
+        <input id="temp" type="range" min="0.3" max="1.5" step="0.1" value="0.8">
+      </div>
+      <div>
+        <label for="seed">Seed</label>
+        <input id="seed" type="number" value="0" min="0">
+      </div>
+    </div>
+
+    <button id="go" disabled>Endeea</button><span id="status">Loading the model…</span>
+    <div id="output" aria-live="polite"></div>
+  </div>
+
+  <p class="about">
+    <strong>How it works.</strong> A 4-layer transformer (5.27 million parameters) trained on about 2.6 million tokens of Kikamba.
+    On held-out text it scores 1.521 bits per character, against 3.298 for a bigram model and 2.794 for an MLP.
+    The model was trained in PyTorch, then its weights were exported and the forward pass was rewritten in JavaScript so it runs on your device.
+    Temperature below 1 gives safer text; above 1, more adventurous text.
+  </p>
+  <div id="test"></div>
+</main>
+
+<script src="kikamba.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  $("length").oninput = () => ($("lengthVal").textContent = $("length").value);
+  $("temp").oninput = () => ($("tempVal").textContent = $("temp").value);
+  let model = null;
+
+  KikambaGPT.load().then(async (m) => {
+    model = m;
+    $("go").disabled = false;
+    $("status").textContent = "Ready";
+    if (new URLSearchParams(location.search).has("test")) {
+      const tests = await (await fetch("selftest.json")).json();
+      const r = model.selfTest(tests);
+      $("test").textContent = "Self-test\n" + JSON.stringify(r, null, 2);
+    }
+  }).catch((e) => ($("status").textContent = "Could not load the model: " + e.message));
+
+  $("go").onclick = async () => {
+    $("go").disabled = true;
+    $("status").textContent = "Writing…";
+    $("output").textContent = "";
+    try {
+      const text = await model.generate($("prompt").value, {
+        maxTokens: Number($("length").value),
+        temperature: Number($("temp").value),
+        seed: Number($("seed").value) || 0,
+        onText: (t) => ($("output").textContent = t),
+      });
+      $("output").textContent = text;
+      $("status").textContent = "Done";
+    } catch (e) {
+      $("status").textContent = "Error: " + e.message;
+    }
+    $("go").disabled = false;
+  };
+</script>
+</body>
+</html>

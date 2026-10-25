@@ -2,3 +2,4 @@
 data/raw/
 *.pt
 data/splits/
+app/web/selftest.json
