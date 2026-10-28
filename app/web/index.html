@@ -34,7 +34,7 @@
 <body>
 <main>
   <h1>Kikamba GPT</h1>
-  <p class="lead">A small GPT trained from scratch on Kikamba text. It runs entirely in your browser: nothing you type is sent anywhere. Start a sentence and it continues it. It does not answer questions or translate.</p>
+  <p class="lead">A small GPT trained from scratch on Kikamba text.</p>
 
   <div class="card">
     <label for="prompt">Start of a Kikamba sentence</label>
@@ -59,12 +59,6 @@
     <div id="output" aria-live="polite"></div>
   </div>
 
-  <p class="about">
-    <strong>How it works.</strong> A 4-layer transformer (5.27 million parameters) trained on about 2.6 million tokens of Kikamba.
-    On held-out text it scores 1.521 bits per character, against 3.298 for a bigram model and 2.794 for an MLP.
-    The model was trained in PyTorch, then its weights were exported and the forward pass was rewritten in JavaScript so it runs on your device.
-    Temperature below 1 gives safer text; above 1, more adventurous text.
-  </p>
   <div id="test"></div>
 </main>
 
